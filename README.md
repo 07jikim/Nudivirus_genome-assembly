@@ -45,12 +45,10 @@ We used the NCBI SRA Toolkit to download the raw sequencing data and convert to 
 prefetch SRS2584474
 fastq-dump --split-3 --gzip SRS2584474
 
-🔹 Step 2: Quality Control and Read Filtering
+### 🔹 Step 2: Quality Control and Read Filtering
 Use fastp to remove low-quality reads (Q < 30) and generate quality reports.
 
-bash
-복사
-편집
+```bash
 fastp \
   -i SRS2584474_1.fastq.gz -I SRS2584474_2.fastq.gz \
   -o filtered_R1.fastq.gz -O filtered_R2.fastq.gz \
