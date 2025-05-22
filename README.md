@@ -45,8 +45,20 @@ We used the NCBI SRA Toolkit to download the raw sequencing data and convert to 
 prefetch SRS2584474
 fastq-dump --split-3 --gzip SRS2584474
 
-### 🔹 Step 2: Quality Control and Read Filtering
-Use fastp to remove low-quality reads (Q < 30) and generate quality reports.
+# 🔹 Step 2: Quality Control and Read Filtering
+
+In this step, we used [`fastp`](https://github.com/OpenGene/fastp) to filter out low-quality reads and generate basic quality control reports.
+
+---
+
+## 🧪 Tool: `fastp`
+
+Fastp is an ultra-fast all-in-one FASTQ preprocessor.  
+It performs quality filtering, trimming, and generates both HTML and JSON QC reports.
+
+---
+
+## ⚙️ Command
 
 ```bash
 fastp \
@@ -54,22 +66,28 @@ fastp \
   -o filtered_R1.fastq.gz -O filtered_R2.fastq.gz \
   -q 30 -u 10 \
   -h fastp_report.html -j fastp_report.json
--q 30: trim reads with quality < Q30
 
--u 10: remove reads with >10% low-quality bases
 
--h/-j: generate HTML and JSON quality reports
+# 🔹 Step 3: Viral Genome Assembly
 
-🔹 Step 3: Viral Genome Assembly
-Assemble filtered reads into contigs using SPAdes genome assembler.
+In this step, we used [`SPAdes`](https://github.com/ablab/spades) to assemble the filtered paired-end reads into contigs.
 
-bash
+---
 
+## 🧪 Tool: `SPAdes`
+
+SPAdes (St. Petersburg genome assembler) is a popular assembler optimized for small genomes, metagenomics, and single-cell sequencing.
+
+---
+
+## ⚙️ Command
+
+```bash
 spades.py \
   --careful --only-assembler \
   -1 filtered_R1.fastq.gz -2 filtered_R2.fastq.gz \
   -o spades_output
-The --careful option reduces mismatches and short indels.
+
 The resulting contigs will be stored in spades_output/contigs.fasta.
 
 🔹 Step 4: Viral Contig Identification
