@@ -45,17 +45,6 @@ We used the NCBI SRA Toolkit to download the raw sequencing data and convert to 
 prefetch SRS2584474
 fastq-dump --split-3 --gzip SRS2584474
 
-# 🔹 Step 2: Quality Control and Read Filtering
-### 🔹 Step 1: Download Raw SRA Data
-
-We used the NCBI SRA Toolkit to download the raw sequencing data and convert to FASTQ format.
-
-```bash
-# Install SRA Toolkit if not already installed
-# Download data using prefetch and fastq-dump
-prefetch SRS2584474
-fastq-dump --split-3 --gzip SRS2584474
-```
 
 ---
 
@@ -63,14 +52,7 @@ fastq-dump --split-3 --gzip SRS2584474
 
 In this step, we used [`fastp`](https://github.com/OpenGene/fastp) to filter out low-quality reads and generate basic quality control reports.
 
----
 
-#### 🧪 Tool: `fastp`
-
-Fastp is an ultra-fast all-in-one FASTQ preprocessor.  
-It performs quality filtering, trimming, and generates both HTML and JSON QC reports.
-
----
 
 #### ⚙️ Command
 
@@ -88,13 +70,6 @@ fastp \
 
 In this step, we used [`SPAdes`](https://github.com/ablab/spades) to assemble the filtered paired-end reads into contigs.
 
----
-
-#### 🧪 Tool: `SPAdes`
-
-SPAdes (St. Petersburg genome assembler) is a popular assembler optimized for small genomes, metagenomics, and single-cell sequencing.
-
----
 
 #### ⚙️ Command
 
