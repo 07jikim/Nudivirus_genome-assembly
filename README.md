@@ -46,19 +46,33 @@ prefetch SRS2584474
 fastq-dump --split-3 --gzip SRS2584474
 
 # 🔹 Step 2: Quality Control and Read Filtering
+### 🔹 Step 1: Download Raw SRA Data
+
+We used the NCBI SRA Toolkit to download the raw sequencing data and convert to FASTQ format.
+
+```bash
+# Install SRA Toolkit if not already installed
+# Download data using prefetch and fastq-dump
+prefetch SRS2584474
+fastq-dump --split-3 --gzip SRS2584474
+```
+
+---
+
+### 🔹 Step 2: Quality Control and Read Filtering
 
 In this step, we used [`fastp`](https://github.com/OpenGene/fastp) to filter out low-quality reads and generate basic quality control reports.
 
 ---
 
-## 🧪 Tool: `fastp`
+#### 🧪 Tool: `fastp`
 
 Fastp is an ultra-fast all-in-one FASTQ preprocessor.  
 It performs quality filtering, trimming, and generates both HTML and JSON QC reports.
 
 ---
 
-## ⚙️ Command
+#### ⚙️ Command
 
 ```bash
 fastp \
@@ -66,44 +80,49 @@ fastp \
   -o filtered_R1.fastq.gz -O filtered_R2.fastq.gz \
   -q 30 -u 10 \
   -h fastp_report.html -j fastp_report.json
+```
 
+---
 
-# 🔹 Step 3: Viral Genome Assembly
+### 🔹 Step 3: Viral Genome Assembly
 
 In this step, we used [`SPAdes`](https://github.com/ablab/spades) to assemble the filtered paired-end reads into contigs.
 
 ---
 
-## 🧪 Tool: `SPAdes`
+#### 🧪 Tool: `SPAdes`
 
 SPAdes (St. Petersburg genome assembler) is a popular assembler optimized for small genomes, metagenomics, and single-cell sequencing.
 
 ---
 
-## ⚙️ Command
+#### ⚙️ Command
 
 ```bash
 spades.py \
   --careful --only-assembler \
   -1 filtered_R1.fastq.gz -2 filtered_R2.fastq.gz \
   -o spades_output
+```
 
-The resulting contigs will be stored in spades_output/contigs.fasta.
+The resulting contigs will be stored in `spades_output/contigs.fasta`.
 
-🔹 Step 4: Viral Contig Identification
+---
+
+### 🔹 Step 4: Viral Contig Identification
+
 Use BLASTx to identify viral contigs from the assembled sequences by comparison to the NCBI non-redundant protein database.
 
-bash
+```bash
 blastx -query spades_output/contigs.fasta \
   -db nr \
   -evalue 1e-5 \
   -outfmt 6 \
   -num_threads 8 \
   -out blastx_results.txt
--evalue 1e-5: set significance threshold
+```
 
--outfmt 6: tabular output
+- `outfmt 6`: tabular output  
+- `evalue 1e-5`: set significance threshold  
+- `num_threads`: number of CPU threads
 
--num_threads: number of CPU threads
-
-Tip: Filter BLAST results using awk, grep, or import into R/Python for downstream annotation.
