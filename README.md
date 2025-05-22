@@ -64,8 +64,7 @@ fastp \
 Assemble filtered reads into contigs using SPAdes genome assembler.
 
 bash
-복사
-편집
+
 spades.py \
   --careful --only-assembler \
   -1 filtered_R1.fastq.gz -2 filtered_R2.fastq.gz \
@@ -77,8 +76,6 @@ The resulting contigs will be stored in spades_output/contigs.fasta.
 Use BLASTx to identify viral contigs from the assembled sequences by comparison to the NCBI non-redundant protein database.
 
 bash
-복사
-편집
 blastx -query spades_output/contigs.fasta \
   -db nr \
   -evalue 1e-5 \
