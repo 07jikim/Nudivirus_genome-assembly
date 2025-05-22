@@ -31,11 +31,66 @@ DOI: [10.1016/j.jviromet.2023.114768](https://www.sciencedirect.com/science/arti
 
 ## 🧬 Bioinformatics Workflow
 
-The pipeline is implemented in **R Markdown** and uses standard bioinformatics tools for genome assembly and annotation. A brief overview is as follows:
+The pipeline is implemented using standard bioinformatics tools and structured in the following steps.
 
-### 1. Read Filtering
+---
+
+### 🔹 Step 1: Download Raw SRA Data
+
+We used the NCBI SRA Toolkit to download the raw sequencing data and convert to FASTQ format.
 
 ```bash
-fastp -i input_R1.fastq.gz -I input_R2.fastq.gz \
-      -o filtered_R1.fastq.gz -O filtered_R2.fastq.gz \
-      -q 30 -u 10 -h fastp.html -j fastp.json
+# Install SRA Toolkit if not already installed
+# Download data using prefetch and fastq-dump
+prefetch SRS2584474
+fastq-dump --split-3 --gzip SRS2584474
+
+🔹 Step 2: Quality Control and Read Filtering
+Use fastp to remove low-quality reads (Q < 30) and generate quality reports.
+
+bash
+복사
+편집
+fastp \
+  -i SRS2584474_1.fastq.gz -I SRS2584474_2.fastq.gz \
+  -o filtered_R1.fastq.gz -O filtered_R2.fastq.gz \
+  -q 30 -u 10 \
+  -h fastp_report.html -j fastp_report.json
+-q 30: trim reads with quality < Q30
+
+-u 10: remove reads with >10% low-quality bases
+
+-h/-j: generate HTML and JSON quality reports
+
+🔹 Step 3: Viral Genome Assembly
+Assemble filtered reads into contigs using SPAdes genome assembler.
+
+bash
+복사
+편집
+spades.py \
+  --careful --only-assembler \
+  -1 filtered_R1.fastq.gz -2 filtered_R2.fastq.gz \
+  -o spades_output
+The --careful option reduces mismatches and short indels.
+The resulting contigs will be stored in spades_output/contigs.fasta.
+
+🔹 Step 4: Viral Contig Identification
+Use BLASTx to identify viral contigs from the assembled sequences by comparison to the NCBI non-redundant protein database.
+
+bash
+복사
+편집
+blastx -query spades_output/contigs.fasta \
+  -db nr \
+  -evalue 1e-5 \
+  -outfmt 6 \
+  -num_threads 8 \
+  -out blastx_results.txt
+-evalue 1e-5: set significance threshold
+
+-outfmt 6: tabular output
+
+-num_threads: number of CPU threads
+
+Tip: Filter BLAST results using awk, grep, or import into R/Python for downstream annotation.
